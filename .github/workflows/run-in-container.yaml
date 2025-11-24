@@ -1,4 +1,4 @@
-name: CI
+name: Run in container
 on:
   workflow_dispatch:
   push:
