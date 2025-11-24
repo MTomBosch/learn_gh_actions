@@ -10,10 +10,9 @@ on:
           - node:latest
           - ubuntu:latest
           - releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
-          - ghcr.io/MTomBosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
-          - ghcr.io/MTomBosch/big-img:latest
+          - ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
           - ghcr.io/mtombosch/big-img:latest
-        default: ghcr.io/MTomBosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
+        default: ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
   push:
     branches: [ main ]
   
