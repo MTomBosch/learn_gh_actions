@@ -1,13 +1,24 @@
 name: Run in container
 on:
   workflow_dispatch:
+    inputs:
+      docker_image:
+        description: "Docker image to use"
+        required: true
+        type: choice
+        options:
+          - node:latest
+          - ubuntu:latest
+          - releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
+        default: node:latest
   push:
     branches: [ main ]
+  
 jobs:
   container-test-job:
     runs-on: ubuntu-latest
     container:
-      image: node:latest
+      image: ${{ inputs.docker_image }}
       env:
         NODE_ENV: development
       ports:
@@ -16,5 +27,5 @@ jobs:
 #        - my_docker_volume:/volume_mount
       options: --cpus 1
     steps:
-      - name: Check for dockerenv file
+      - name: Check for dockerenv file in container ${{ inputs.docker_image }}
         run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
