@@ -17,6 +17,8 @@ on:
     branches: [ main ]
 env:
   IMG: ${{ inputs.docker_image }}
+  USR: ${{ github.repository_owner }}
+  PW: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   container-test-job:
     runs-on: ubuntu-latest
@@ -40,6 +42,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - run: |
+          sudo docker login --username $USR --password $PW ghcr.io
           sudo docker pull ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
           sudo docker pull ${IMG}
           echo "Done"
