@@ -40,6 +40,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - run: |
-          docker pull ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
-          docker pull ${IMG}
+          sudo docker pull ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
+          sudo docker pull ${IMG}
           echo "Done"
