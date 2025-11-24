@@ -15,7 +15,8 @@ on:
         default: ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
   push:
     branches: [ main ]
-  
+env:
+  IMG: ${{ inputs.docker_image }}
 jobs:
   container-test-job:
     runs-on: ubuntu-latest
@@ -40,5 +41,3 @@ jobs:
 
       - run: |
           docker pull ${IMG}
-        env:
-          IMG: ${{ inputs.docker_image }}
