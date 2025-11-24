@@ -11,7 +11,8 @@ on:
           - ubuntu:latest
           - releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
           - ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf
-        default: ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf
+          - mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf
+        default: mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf
   push:
     branches: [ main ]
   
