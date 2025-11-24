@@ -10,7 +10,8 @@ on:
           - node:latest
           - ubuntu:latest
           - releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
-        default: node:latest
+          - ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf
+        default: ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf
   push:
     branches: [ main ]
   
