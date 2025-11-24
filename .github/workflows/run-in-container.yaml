@@ -39,4 +39,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - run: |
-          docker pull ${{ inputs.docker_image }}
+          docker pull ${IMG}
+        env:
+          IMG: ${{ inputs.docker_image }}
