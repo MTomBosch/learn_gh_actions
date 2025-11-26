@@ -56,8 +56,7 @@ jobs:
 
       - run: |
           sudo docker login --username $USR --password $PW ghcr.io
-          sudo docker pull ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
-          sudo docker pull ${IMG}
+          sudo docker pull $IMG
           echo "Done"
   service-container-test-job:
     runs-on: ubuntu-latest
@@ -83,7 +82,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           sudo docker login --username $USR --password $PW ghcr.io
-          sudo docker tag ${IMG_PUSH} ghcr.io/mtombosch/${IMG_PUSH}
+          sudo docker tag $IMG_PUSH ghcr.io/mtombosch/$IMG_PUSH
           sudo docker push ghcr.io/mtombosch/${IMG_PUSH}
           echo "Done"
         
