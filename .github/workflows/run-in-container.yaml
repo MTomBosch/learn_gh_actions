@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       docker_image:
-        description: "Docker image to use"
+        description: "Docker image to pull"
         required: true
         type: choice
         options:
@@ -13,12 +13,26 @@ on:
           - ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
           - ghcr.io/mtombosch/big-img:latest
         default: ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
+      docker_image_push:
+        description: "Docker image to push to ghcr"
+        required: true
+        default: pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
   push:
     branches: [ main ]
 env:
   IMG: ${{ inputs.docker_image }}
+  IMG_PUSH: ${{ inputs.docker_image_push }}
   USR: ${{ github.repository_owner }}
   PW: ${{ secrets.GITHUB_TOKEN }}
+permissions:
+  actions: read
+  contents: read
+  id-token: read
+  issues: read
+  packages: write
+  pages: read
+  pull-requests: read
+  repository-projects: read
 jobs:
   container-test-job:
     runs-on: ubuntu-latest
@@ -54,3 +68,23 @@ jobs:
     steps:
       - name: Hello World
         run: echo "Hellow World"
+  docker-uload-test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hello World
+        run: echo "Hellow World"
+      - run: |
+          sudo docker pull ${{ inputs.docker_image_push }}
+          echo "Done"
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          sudo docker login --username $USR --password $PW ghcr.io
+          sudo docker tag ${IMG_PUSH} ghcr.io/mtombosch/${IMG_PUSH}
+          sudo docker push ghcr.io/mtombosch/${IMG_PUSH}
+          echo "Done"
+        
