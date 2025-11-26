@@ -101,3 +101,4 @@ jobs:
         with:
           tags: ghcr.io/mtombosch/big_random_img:latest
           platforms: linux/amd64 # TODO: add multi arch "linux/amd64,linux/arm64"
+          push: true
