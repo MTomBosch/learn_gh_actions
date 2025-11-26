@@ -5,14 +5,12 @@ on:
       docker_image:
         description: "Docker image to pull"
         required: true
-        type: choice
-        options:
-          - node:latest
-          - ubuntu:latest
-          - releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
-          - ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
-          - ghcr.io/mtombosch/big-img:latest
-        default: ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
+        default: ghcr.io/mtombosch/pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
+#          - releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
+#          - ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
+#          - ghcr.io/mtombosch/big-img:latest
+#          - ghcr.io/mtombosch/big-img:latest
+#          - ghcr.io/mtombosch/pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
       docker_image_push:
         description: "Docker image to push to ghcr"
         required: true
