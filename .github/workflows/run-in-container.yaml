@@ -153,7 +153,7 @@ jobs:
       - name: Get Date
         id: get-date
         run: |
-          echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
+          echo "date=$(/bin/date -u "+%Y%m%d-%HH%MM%SS")" >> $GITHUB_OUTPUT
         shell: bash
       - name: Cache files
         id: cache-primes
