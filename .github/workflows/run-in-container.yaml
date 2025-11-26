@@ -172,6 +172,6 @@ jobs:
           head -c 1G /dev/urandom > ./actions_cache/1gb_file_3.txt
           head -c 1G /dev/urandom > ./actions_cache/1gb_file_4.txt
           cd ./actions_cache
-          for i in {1..2000}; do dd if=/dev/urandom bs=2048 count=1 of=file$i; done
+          for i in {1..2000}; do dd if=/dev/urandom bs=20048 count=1 of=file$i; done
 
           
