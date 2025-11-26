@@ -1,11 +1,11 @@
-name: Run in container
+name: Run cache performance tests
 on:
   workflow_dispatch:
     inputs:
       docker_image:
         description: "Docker image to pull"
         required: true
-        default: ghcr.io/mtombosch/pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
+        default: ghcr.io/mtombosch/big_random_img:latest
 #          - releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
 #          - ghcr.io/mtombosch/releases-docker.jfrog.io/jfrog/jfrog-cli-full-v2-jf:latest
 #          - ghcr.io/mtombosch/big-img:latest
