@@ -27,7 +27,6 @@ env:
 permissions:
   actions: read
   contents: read
-  id-token: read
   issues: read
   packages: write
   pages: read
