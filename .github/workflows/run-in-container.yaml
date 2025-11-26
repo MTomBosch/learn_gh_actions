@@ -121,3 +121,54 @@ jobs:
           tags: ghcr.io/mtombosch/big_random_img:latest
           platforms: linux/amd64 # TODO: add multi arch "linux/amd64,linux/arm64"
           push: true
+
+  actions-cache-load-and-upload-test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5.0.0 
+      # On the std gh runner the creation of a 5GB docker image is working but when trying to push it there is "no space left on
+      # device" error showing up. Because of that space must be freed up to be able to create and push the image.
+      - name: Show disk space after checkout
+        run: |
+          echo 'Disk space before build:'
+          df -h
+      - name: Removing unneeded software
+        run: |
+          echo "Removing unneeded software... "
+          if [ -d /usr/share/dotnet ]; then echo "Removing dotnet..."; start=$(date +%s); sudo rm -rf /usr/share/dotnet; end=$(date +%s); echo "Duration: $((end-start))s"; fi
+          #if [ -d /usr/local/lib/android ]; then echo "Removing android..."; start=$(date +%s); sudo rm -rf /usr/local/lib/android; end=$(date +%s); echo "Duration: $((end-start))s"; fi
+          if [ -d /opt/ghc ]; then echo "Removing haskell (ghc)..."; start=$(date +%s); sudo rm -rf /opt/ghc; end=$(date +%s); echo "Duration: $((end-start))s"; fi
+          if [ -d /usr/local/.ghcup ]; then echo "Removing haskell (ghcup)..."; start=$(date +%s); sudo rm -rf /usr/local/.ghcup; end=$(date +%s); echo "Duration: $((end-start))s"; fi
+          if [ -d /usr/share/swift ]; then echo "Removing swift..."; start=$(date +%s); sudo rm -rf /usr/share/swift; end=$(date +%s); echo "Duration: $((end-start))s"; fi
+          if [ -d /usr/local/share/chromium ]; then echo "Removing chromium..."; start=$(date +%s); sudo rm -rf /usr/local/share/chromium; end=$(date +%s); echo "Duration: $((end-start))s"; fi
+      - name: Show disk space after cleanup
+        run: |
+          echo 'Disk space after cleanup:'
+          df -h
+      - name: Creating cache folder
+        run: |
+          echo "Creating cache folder... "
+          mkdir -p actions_cache
+    # http://man7.org/linux/man-pages/man1/date.1.html
+      - name: Get Date
+        id: get-date
+        run: |
+          echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
+        shell: bash
+      - name: Cache files
+        id: cache-primes
+        uses: actions/cache@v4
+        with:
+          path: actions_cache
+          key: actions_cache-${{ runner.os }}-${{ steps.get-date.outputs.date }}
+          restore-keys: |
+            actions_cache-${{ runner.os }}
+      - name: Generate 4 GB cache files
+        run: |
+          rm -rf actions_cache
+          mkdir -p actions_cache
+          head -c 1G /dev/urandom > ./actions_cache/1gb_file_1.txt
+          head -c 1G /dev/urandom > ./actions_cache/1gb_file_2.txt
+          head -c 1G /dev/urandom > ./actions_cache/1gb_file_3.txt
+          head -c 1G /dev/urandom > ./actions_cache/1gb_file_4.txt
+          
