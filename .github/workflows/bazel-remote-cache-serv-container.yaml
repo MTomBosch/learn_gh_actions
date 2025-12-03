@@ -29,8 +29,11 @@ jobs:
         #       At least using env variables does not work
         image: buchgr/bazel-remote-cache:latest
         env: 
-          BAZEL_REMOTE_MAX_SIZE: 10
-          BAZEL_REMOTE_ENABLE_ENDPOINT_METRICS: true
+          BAZEL_REMOTE_MAX_SIZE: "10"
+          BAZEL_REMOTE_ENABLE_ENDPOINT_METRICS: "true"
+          BAZEL_REMOTE_DIR: "/data"
+          BAZEL_REMOTE_HTTP_ADDRESS: ":8080"
+          BAZEL_REMOTE_PROFILE_ADDRESS: ":6060"
         ports: 
           - 9090:8080
           - 9092:9092
@@ -45,8 +48,10 @@ jobs:
         run: |
           echo "Container id: $CONTAINER_ID
           echo "Ports id: $PORTS
+          docker ps
+          docker inspect $CONTAINER_ID
         env:
-          PORTS: ${{ job.services.bazel-remote-cache.ports }}
+          PORTS: ${{ fromJSON(job.services.bazel-remote-cache.ports) }}
           CONTAINER_ID: ${{ job.services.bazel-remote-cache.id }}
       - name: Get remote cache status
         run: curl localhost:9090/status
