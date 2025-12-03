@@ -69,7 +69,7 @@ jobs:
           docker inspect $CONTAINER_ID
 
           echo "Showing container log files"
-          find /var/lib/docker/containers/ -name "*.log" -exec cat {} \;
+          sudo find /var/lib/docker/containers/ -name "*.log" -exec cat {} \;
         env:
           CONTAINER_ID: ${{ job.services.bazel-remote-cache.id }}
       - name: Get remote cache status
@@ -79,6 +79,7 @@ jobs:
           curl 127.0.0.1:9090/status
           curl bazel-remote-cache:9090/status
   docker-pull-test-job:
+    if: ${{ inputs.never }}
     runs-on: ubuntu-latest
     steps:
       - name: Get user details
