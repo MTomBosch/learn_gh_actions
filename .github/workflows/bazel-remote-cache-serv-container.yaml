@@ -119,7 +119,9 @@ jobs:
           # Must only export the container bazel-remote-cache-no-volume as the data from volume mounts (in container bazel-remote-cache) are not exported  
           docker export --output="${TEMP}/bazel-remote-cache-no-volume.tar" $CONTAINER_ID_2
           ls -l ${TEMP}/bazel-remote-cache-no-volume.tar
-          docker image import ${TEMP}/bazel-remote-cache-no-volume.tar ghcr.io/${{ github.repository_owner }}/my-bazel-remote-cache:latest
+          repo-owner-lower-case=${{ github.repository_owner }}
+          repo-owner-lower-case=${repo-owner-lower,,}
+          docker image import ${TEMP}/bazel-remote-cache-no-volume.tar ghcr.io/${repo-owner-lower-case}/my-bazel-remote-cache:latest
           docker image list
         env:
           CONTAINER_ID_2: ${{ job.services.bazel-remote-cache-no-volume.id }}
@@ -132,7 +134,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/my-bazel-remote-cache:latest
+          repo-owner-lower-case=${{ github.repository_owner }}
+          repo-owner-lower-case=${repo-owner-lower,,}
+          docker push ghcr.io/${repo-owner-lower-case}/my-bazel-remote-cache:latest
 
 #      - name: Build and push Docker images
 #        uses: docker/build-push-action@ccc2b40e9ea6518f9252a22a990f8e868370f62e # v6.18.0
