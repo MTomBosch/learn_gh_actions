@@ -28,7 +28,9 @@ jobs:
         # TODO: Can this be configured using variables defined in repo/org?
         #       At least using env variables does not work
         image: buchgr/bazel-remote-cache:latest
-        options: "--max_size 10 --enable_endpoint_metrics"
+        env: 
+          BAZEL_REMOTE_MAX_SIZE: 10
+          BAZEL_REMOTE_ENABLE_ENDPOINT_METRICS: true
         ports: 
           - 9090:8080
           - 9092:9092
@@ -71,7 +73,7 @@ jobs:
           # that are free must be identified first OR some algorithm defined that no conflicts are happening
           http_port=9090
           grpc_port=9092
-          containerid=$(docker run -d -u ${userid}:1000 -v $(pwd)/remote_cache_data:/data -p ${http_port}:8080 -p ${grcp_port}:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
+          containerid=$(docker run -d -u ${userid}:1000 -v $(pwd)/remote_cache_data:/data -p ${http_port}:8080 -p ${grpc_port}:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
           set +x
           sleep 5
           docker container list
