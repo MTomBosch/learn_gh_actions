@@ -138,7 +138,8 @@ jobs:
           # that are free must be identified first OR some algorithm defined that no conflicts are happening
           http_port=9090
           grpc_port=9092
-          containerid=$(docker run -d -u ${userid} -v $(pwd)/remote_cache_data:/data -p ${http_port}:8080 -p ${grpc_port}:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
+          # Todo: Use --rm flag to remove the container data and its volumes from the docker storage after it stops?
+          containerid=$(docker run  -d -u ${userid} -v $(pwd)/remote_cache_data:/data -p ${http_port}:8080 -p ${grpc_port}:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
           set +x
           sleep 5
           docker container list
