@@ -9,7 +9,7 @@ on:
   push:
     branches: [ main ]
 env:
-  IMG: ${{ inputs.docker_image }}
+  IMG: ${{ inputs.docker_image || 'buchgr/bazel-remote:latest' }}
   USR: ${{ github.repository_owner }}
   PW: ${{ secrets.GITHUB_TOKEN }}
 permissions:
@@ -25,7 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     services:
       bazel-remote-cache:
-        image: ${{ inputs.docker_image }}
+        image: ${{ env.IMG }}
     steps:
-      - name: Hello World
-        run: echo "Hellow World"
+      - name: Get user details
+        run: |
+          whoami
+          id -u $(whoami)
+      - name: Get remote cache status
+        run: curl localhost:9090/status
