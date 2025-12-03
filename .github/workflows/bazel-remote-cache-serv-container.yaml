@@ -53,7 +53,27 @@ jobs:
           #- 9092 (grpc end point)
         volumes:
           - ${{ github.workspace }}/_bazel_remote_cache_data:/data:rshared
+      bazel-remote-cache-no-volume:
+        # TODO: Can this be configured using variables defined in repo/org?
+        #       At least using env variables does not work
+        image: buchgr/bazel-remote-cache:latest
+        # "runner" is the user name on GH managed action runners, but it cannot be used here somehow
+        # uid is 1001 for std and large runners but might be different for other custom runners
+        options: "-u 1001"
+        env: 
+          BAZEL_REMOTE_MAX_SIZE: "10"
+          BAZEL_REMOTE_ENABLE_ENDPOINT_METRICS: "true"
+          BAZEL_REMOTE_DIR: "/data"
+          BAZEL_REMOTE_HTTP_ADDRESS: ":8080"
+          BAZEL_REMOTE_PROFILE_ADDRESS: ":6060"
+        ports: 
+          - 9190:8080
+          - 9192:9092
     steps:
+      - name: Make bazel remote cache folder writable (sudo required)
+        run: |
+          set -x
+          sudo chmod 777 ${{ github.workspace }}/_bazel_remote_cache_data
       - name: Get user and workspace details
         run: |
           whoami
@@ -67,23 +87,26 @@ jobs:
           echo "ls -l _bazel_remote_cache_data"
           ls -l _bazel_remote_cache_data
           
-          echo "Container id: $CONTAINER_ID"
+          echo "Container id 1: $CONTAINER_ID"
+          echo "Container id 2: $CONTAINER_ID_2"
           echo "Running docker ps"
           docker ps
 
           echo "Running docker inspect"
           docker inspect $CONTAINER_ID
+          docker inspect $CONTAINER_ID_2
 
           echo "Showing container log files"
           sudo find /var/lib/docker/containers/ -name "*.log" -exec cat {} \;
         env:
           CONTAINER_ID: ${{ job.services.bazel-remote-cache.id }}
+          CONTAINER_ID_2: ${{ job.services.bazel-remote-cache-no-volume.id }}
       - name: Get remote cache status
         run: |
           set +e
+          set -x
           curl localhost:9090/status
-          curl 127.0.0.1:9090/status
-          curl bazel-remote-cache:9090/status
+          curl localhost:9190/status
   docker-pull-test-job:
     if: ${{ inputs.never }}
     runs-on: ubuntu-latest
