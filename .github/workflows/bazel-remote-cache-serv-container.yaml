@@ -59,7 +59,8 @@ jobs:
         image: buchgr/bazel-remote-cache:latest
         # "runner" is the user name on GH managed action runners, but it cannot be used here somehow
         # uid is 1001 for std and large runners but might be different for other custom runners
-        options: "-u 1001"
+        # options: "-u 1001" # With this user the container startup fails because the /data folder is not writable
+        options: "-u root"
         env: 
           BAZEL_REMOTE_MAX_SIZE: "10"
           BAZEL_REMOTE_ENABLE_ENDPOINT_METRICS: "true"
