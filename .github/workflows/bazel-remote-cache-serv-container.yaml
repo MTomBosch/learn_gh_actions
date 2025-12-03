@@ -121,9 +121,8 @@ jobs:
           docker export --output="${TEMP}/bazel-remote-cache-no-volume.tar" $CONTAINER_ID_2
           ls -l ${TEMP}/bazel-remote-cache-no-volume.tar
           repo_owner_lower_case=$USR
-          repo_owner_lower_case=${repo-owner-lower,,}
-          docker image import ${TEMP}/bazel-remote-cache-no-volume.tar my-bazel-remote-cache:latest
-          docker tag my-bazel-remote-cache:latest ghcr.io/${repo_owner_lower_case}/my-bazel-remote-cache:latest
+          repo_owner_lower_case=${repo_owner_lower_case,,}
+          docker image import ${TEMP}/bazel-remote-cache-no-volume.tar ghcr.io/${repo_owner_lower_case}/my-bazel-remote-cache:latest
           docker image list
         env:
           CONTAINER_ID_2: ${{ job.services.bazel-remote-cache-no-volume.id }}
