@@ -38,6 +38,7 @@ jobs:
       - name: Pull remote cache docker image
         run: docker pull $IMG
       - name: Start remote cache docker container
+        shell: bash
         run: |
           set -eou pipefail
           echo "Starting remote cache Docker container"
@@ -45,7 +46,7 @@ jobs:
           mkdir -p remote_cache_data
           chmod 777 ./remote_cache_data
           set -x
-          containerid = $(docker run -d -u ${userid}:1000 -v remote_cache_data:/data -p 9090:8080 -p 9092:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
+          containerid=$(docker run -d -u ${userid}:1000 -v remote_cache_data:/data -p 9090:8080 -p 9092:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
           set +x
           echo "containerid=$containerid" >> $GITHUB_ENV
       - name: Get remote cache status
