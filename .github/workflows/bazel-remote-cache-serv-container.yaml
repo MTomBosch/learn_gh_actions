@@ -52,7 +52,9 @@ jobs:
         run: |
           echo "Container id: $CONTAINER_ID
           echo "Ports: ${{ job.services.bazel-remote-cache.ports }}
+          echo "Running docker ps"
           docker ps
+          echo "Running docker inspect"
           docker inspect $CONTAINER_ID
         env:
           CONTAINER_ID: ${{ job.services.bazel-remote-cache.id }}
