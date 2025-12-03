@@ -23,13 +23,33 @@ permissions:
 jobs:
   service-container-test-job:
     runs-on: ubuntu-latest
-# Feature gap:
-#  - Cannot use env vars for image name definition
-#  - When workflow is triggered by push then the default input values cannot be retrieved as they below
-#          to workflow dispatch
-#    services:
-#      bazel-remote-cache:
-#        image: ${{ env.IMG }}
+    services:
+      bazel-remote-cache:
+        # TODO: Can this be configured using variables defined in repo/org?
+        #       At least using env variables does not work
+        image: buchgr/bazel-remote-cache:latest
+        options: "--max_size 10 --enable_endpoint_metrics"
+        ports: 
+          - 9090:8080
+          - 9092:9092
+          - 9050
+          - 9060/tcp
+    steps:
+      - name: Get user details
+        run: |
+          whoami
+          id -u $(whoami)
+      - name: Get remote cache service container details
+        run: |
+          echo "Container id: $CONTAINER_ID
+          echo "Ports id: $PORTS
+        env:
+          PORTS: ${{ job.services.bazel-remote-cache.ports }}
+          CONTAINER_ID: ${{ job.services.bazel-remote-cache.id }}
+      - name: Get remote cache status
+        run: curl localhost:9090/status
+  docker-pull-test-job:
+    runs-on: ubuntu-latest
     steps:
       - name: Get user details
         run: |
@@ -46,7 +66,12 @@ jobs:
           mkdir -p remote_cache_data
           chmod 777 ./remote_cache_data
           set -x
-          containerid=$(docker run -d -u ${userid}:1000 -v $(pwd)/remote_cache_data:/data -p 9090:8080 -p 9092:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
+          # TODO In case this workflow runs on a single vm where multiple runners are being operated then creating
+          # this Docker container multiple times with the same ports will not work. Because of that http and grpc ports
+          # that are free must be identified first OR some algorithm defined that no conflicts are happening
+          http_port=9090
+          grpc_port=9092
+          containerid=$(docker run -d -u ${userid}:1000 -v $(pwd)/remote_cache_data:/data -p ${http_port}:8080 -p ${grcp_port}:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
           set +x
           sleep 5
           docker container list
