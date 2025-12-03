@@ -74,7 +74,7 @@ jobs:
       - name: Make bazel remote cache folder writable (sudo required)
         run: |
           set -x
-          sudo chmod 777 ${{ github.workspace }}/_bazel_remote_cache_data
+          sudo chmod -R 777 ${{ github.workspace }}/_bazel_remote_cache_data
       - name: Get user and workspace details
         run: |
           whoami
@@ -108,6 +108,12 @@ jobs:
           set -x
           curl localhost:9090/status
           curl localhost:9190/status
+      # Required at end of the job in all cases so that the workspace can be cleaned up be the gha runner user during cleanup operations
+      - name: Make bazel remote cache folder writable (sudo required)
+        run: |
+          set -x
+          sudo chmod -R 777 ${{ github.workspace }}/_bazel_remote_cache_data
+        if: ${{ always() }}
   docker-pull-test-job:
     if: ${{ inputs.never }}
     runs-on: ubuntu-latest
