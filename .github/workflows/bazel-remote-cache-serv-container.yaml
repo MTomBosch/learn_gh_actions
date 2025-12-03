@@ -39,11 +39,15 @@ jobs:
           - 9092:9092
           - 9050
           - 9060/tcp
+        volumes:
+          - ${{ github.workspace }}/_bazel_remote_cache_data:/data
     steps:
-      - name: Get user details
+      - name: Get user and workspace details
         run: |
           whoami
           id -u $(whoami)
+          pwd
+          ls -l
       - name: Get remote cache service container details
         run: |
           echo "Container id: $CONTAINER_ID
