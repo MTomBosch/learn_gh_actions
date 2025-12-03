@@ -39,16 +39,25 @@ jobs:
         run: docker pull $IMG
       - name: Start remote cache docker container
         run: |
+          set -eou pipefail
           echo "Starting remote cache Docker container"
-          echo "TODO ADD DOCKER RUN COMMAND"
-          echo "Docker container id: TODO XXX"
+          userid=$(id -u $(whoami))
+          mkdir -p remote_cache_data
+          chmod 777 ./remote_cache_data
+          set -x
+          containerid = $(docker run -d -u ${userid}:1000 -v remote_cache_data:/data -p 9090:8080 -p 9092:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
+          set +x
+          echo "containerid=${containerid}" >> $GITHUB_ENV
+          echo "Docker container id: ${containerid}"
       - name: Get remote cache status
         run: curl localhost:9090/status
       - name: Run some code that uses the remote cache
         run: echo "Running some code"
       - name: Stop remote cache docker container
-        if: ${{ vars.REMOTE_CACHE_CONTAINER_ID }}
+        if: ${{ env.containerid }}
         run: |
-          echo "Stopping remote cache Docker container with id $REMOTE_CACHE_CONTAINER_ID "
-          docker container stop $REMOTE_CACHE_CONTAINER_ID || true
+          echo "Stopping remote cache Docker container with id $containerid "
+          docker container stop $containerid || true
+      - name: Get remote cache status
+        run: curl localhost:9090/status
           
