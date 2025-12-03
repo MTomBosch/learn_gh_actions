@@ -47,11 +47,10 @@ jobs:
       - name: Get remote cache service container details
         run: |
           echo "Container id: $CONTAINER_ID
-          echo "Ports id: $PORTS
+          echo "Ports: ${{ job.services.bazel-remote-cache.ports }}
           docker ps
           docker inspect $CONTAINER_ID
         env:
-          PORTS: ${{ fromJSON(job.services.bazel-remote-cache.ports) }}
           CONTAINER_ID: ${{ job.services.bazel-remote-cache.id }}
       - name: Get remote cache status
         run: curl localhost:9090/status
