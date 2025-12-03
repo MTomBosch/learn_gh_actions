@@ -30,7 +30,13 @@ jobs:
         image: buchgr/bazel-remote-cache:latest
         # "runner" is the user name on GH managed action runners, but it cannot be used here somehow
         # uid is 1001 for std and large runners but might be different for other custom runners
-        options: "-u 1001:1001"
+        #options: "-u 1001:1001"
+        # With this setting the container aborts soon after startup because it cannot write the default folder structure to
+        # the data folder "_bazel_remote_cache_data" defined below because this folder is created by "root" user.
+        
+        # Needs to be root as the initial data folder _bazel_remote_cache_data is created by the root user
+        # and there is no way to change the permissions for this folder between its creation and the docker container startup
+        options: "-u root"
         env: 
           BAZEL_REMOTE_MAX_SIZE: "10"
           BAZEL_REMOTE_ENABLE_ENDPOINT_METRICS: "true"
