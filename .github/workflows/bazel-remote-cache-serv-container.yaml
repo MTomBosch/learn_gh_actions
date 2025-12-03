@@ -28,9 +28,9 @@ jobs:
         # TODO: Can this be configured using variables defined in repo/org?
         #       At least using env variables does not work
         image: buchgr/bazel-remote-cache:latest
-        # "runner is the user name on GH managed action runners"
-        # "uid is 1001 for std and large runners
-        options: "-u runner"
+        # "runner" is the user name on GH managed action runners, but it cannot be used here somehow
+        # uid is 1001 for std and large runners but might be different for other custom runners
+        options: "-u 1001"
         env: 
           BAZEL_REMOTE_MAX_SIZE: "10"
           BAZEL_REMOTE_ENABLE_ENDPOINT_METRICS: "true"
