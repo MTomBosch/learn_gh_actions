@@ -67,6 +67,9 @@ jobs:
 
           echo "Running docker inspect"
           docker inspect $CONTAINER_ID
+
+          echo "Showing container log files"
+          find /var/lib/docker/containers/ -name "*.log" -exec cat {} \;
         env:
           CONTAINER_ID: ${{ job.services.bazel-remote-cache.id }}
       - name: Get remote cache status
