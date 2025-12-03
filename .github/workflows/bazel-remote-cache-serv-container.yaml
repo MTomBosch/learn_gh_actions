@@ -61,5 +61,5 @@ jobs:
           echo "Stopping remote cache Docker container with id $containerid "
           docker container stop $containerid || true
       - name: Get remote cache status
-        run: curl localhost:9090/status
+        run: curl localhost:9090/status || true
           
