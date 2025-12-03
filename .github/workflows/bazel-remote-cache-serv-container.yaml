@@ -135,8 +135,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push Docker image
         run: |
-          repo_owner_lower_case=${{ github.repository_owner }}
-          repo_owner_lower_case=${repo-owner-lower,,}
+          repo_owner_lower_case=$USR
+          repo_owner_lower_case=${repo_owner_lower_case,,}
           docker push ghcr.io/${repo_owner_lower_case}/my-bazel-remote-cache:latest
 
 #      - name: Build and push Docker images
