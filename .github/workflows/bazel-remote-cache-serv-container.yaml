@@ -37,7 +37,7 @@ jobs:
         ports: 
           - 9090:8080
           - 9092:9092
-          # Use foolowing two entries to get an free port mapped to the internal ports.
+          # Use following two entries to get an free port mapped to the internal ports.
           # But then the usd ports must be identifed using docked inspect command
           # This is required very likely if in future one vm can run multiple gh action runner and all the runners share the ports of the vm
           #- 8080 (http end point port)
@@ -51,15 +51,13 @@ jobs:
           id -u $(whoami)
           pwd
           ls -l
+
       - name: Get remote cache service container details
         run: |
+
           echo "ls -l _bazel_remote_cache_data"
           ls -l _bazel_remote_cache_data
-
           echo "Container id: $CONTAINER_ID
-
-          echo "Ports: ${{ fromJSON(job.services.bazel-remote-cache.ports) }}
-
           echo "Running docker ps"
           docker ps
 
