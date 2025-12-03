@@ -46,7 +46,7 @@ jobs:
           #- 8080 (http end point port)
           #- 9092 (grpc end point)
         volumes:
-          - ${{ github.workspace }}/_bazel_remote_cache_data:/data
+          - ${{ github.workspace }}/_bazel_remote_cache_data:/data:rshared
     steps:
       - name: Get user and workspace details
         run: |
