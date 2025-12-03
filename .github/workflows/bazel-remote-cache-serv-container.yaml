@@ -115,11 +115,12 @@ jobs:
           sudo chmod -R 777 ${{ github.workspace }}/_bazel_remote_cache_data
         if: ${{ always() }}
       - name: Export Docker container to tar file and create new image out of it
+        shell: bash
         run: |
           # Must only export the container bazel-remote-cache-no-volume as the data from volume mounts (in container bazel-remote-cache) are not exported  
           docker export --output="${TEMP}/bazel-remote-cache-no-volume.tar" $CONTAINER_ID_2
           ls -l ${TEMP}/bazel-remote-cache-no-volume.tar
-          repo-owner-lower-case=${{ github.repository_owner }}
+          repo-owner-lower-case=$USR
           repo-owner-lower-case=${repo-owner-lower,,}
           docker image import ${TEMP}/bazel-remote-cache-no-volume.tar ghcr.io/${repo-owner-lower-case}/my-bazel-remote-cache:latest
           docker image list
