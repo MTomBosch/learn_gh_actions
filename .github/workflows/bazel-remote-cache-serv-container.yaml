@@ -46,8 +46,10 @@ jobs:
           mkdir -p remote_cache_data
           chmod 777 ./remote_cache_data
           set -x
-          containerid=$(docker run -d -u ${userid}:1000 -v remote_cache_data:/data -p 9090:8080 -p 9092:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
+          containerid=$(docker run -d -u ${userid}:1000 -v $(pwd)/remote_cache_data:/data -p 9090:8080 -p 9092:9092 buchgr/bazel-remote-cache --max_size 10 --enable_endpoint_metrics)
           set +x
+          sleep 5
+          docker container list
           echo "containerid=$containerid" >> $GITHUB_ENV
       - name: Get remote cache status
         run: curl localhost:9090/status
