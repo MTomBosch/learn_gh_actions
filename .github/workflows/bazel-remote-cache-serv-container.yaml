@@ -23,13 +23,32 @@ permissions:
 jobs:
   service-container-test-job:
     runs-on: ubuntu-latest
-    services:
-      bazel-remote-cache:
-        image: ${{ env.IMG }}
+# Feature gap:
+#  - Cannot use env vars for image name definition
+#  - When workflow is triggered by push then the default input values cannot be retrieved as they below
+#          to workflow dispatch
+#    services:
+#      bazel-remote-cache:
+#        image: ${{ env.IMG }}
     steps:
       - name: Get user details
         run: |
           whoami
           id -u $(whoami)
+      - name: Pull remote cache docker image
+        run: docker pull $IMG
+      - name: Start remote cache docker container
+        run: |
+          echo "Starting remote cache Docker container"
+          echo "TODO ADD DOCKER RUN COMMAND"
+          echo "Docker container id: TODO XXX"
       - name: Get remote cache status
         run: curl localhost:9090/status
+      - name: Run some code that uses the remote cache
+        run: echo "Running some code"
+      - name: Stop remote cache docker container
+        if: ${{ vars.REMOTE_CACHE_CONTAINER_ID }}
+        run: |
+          echo "Stopping remote cache Docker container with id $REMOTE_CACHE_CONTAINER_ID "
+          docker container stop $REMOTE_CACHE_CONTAINER_ID || true
+          
