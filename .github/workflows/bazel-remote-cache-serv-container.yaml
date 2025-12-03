@@ -37,8 +37,11 @@ jobs:
         ports: 
           - 9090:8080
           - 9092:9092
-          - 9050
-          - 9060/tcp
+          # Use foolowing two entries to get an free port mapped to the internal ports.
+          # But then the usd ports must be identifed using docked inspect command
+          # This is required very likely if in future one vm can run multiple gh action runner and all the runners share the ports of the vm
+          #- 8080 (http end point port)
+          #- 9092 (grpc end point)
         volumes:
           - ${{ github.workspace }}/_bazel_remote_cache_data:/data
     steps:
@@ -50,16 +53,24 @@ jobs:
           ls -l
       - name: Get remote cache service container details
         run: |
+          echo "ls -l _bazel_remote_cache_data"
+          ls -l _bazel_remote_cache_data
+
           echo "Container id: $CONTAINER_ID
-          echo "Ports: ${{ job.services.bazel-remote-cache.ports }}
+
+          echo "Ports: ${{ fromJSON(job.services.bazel-remote-cache.ports) }}
+
           echo "Running docker ps"
           docker ps
+
           echo "Running docker inspect"
           docker inspect $CONTAINER_ID
         env:
           CONTAINER_ID: ${{ job.services.bazel-remote-cache.id }}
       - name: Get remote cache status
-        run: curl localhost:9090/status
+        run: |
+          curl localhost:9090/status
+          curl bazel-remote-cache:9090/status
   docker-pull-test-job:
     runs-on: ubuntu-latest
     steps:
