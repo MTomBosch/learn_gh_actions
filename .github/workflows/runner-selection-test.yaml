@@ -24,7 +24,7 @@ jobs:
   prepare:
     name: Prepare job to compute runner label
     outputs:
-      runner_label: ${{ steps.compute-runner-label.runner_label }}
+      runner_label: ${{ steps.compute-runner-label.outputs.runner_label }}
     runs-on: "ubuntu-slim"
     steps:
       - name: Compute runner label
