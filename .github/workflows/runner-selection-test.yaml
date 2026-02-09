@@ -17,7 +17,13 @@ on:
 jobs:
   common:
     name: Common
-    runs-on: ${{ inputs.runner_label }}
+    #runs-on: ${{ inputs.runner_label }}
+    runs-on: |-
+      ${{ case(
+        inputs.runner_label != '', inputs.runner_label,
+        vars.runner_label != '', vars.runner_label,
+        'ubuntu-latest'
+      ) }}
     steps:
       - run: |
           echo "Hello World on runner: ${{ inputs.runner_label }}"
