@@ -11,9 +11,9 @@ on:
   push:
     branches: [ main ]
 env:
+  # the sh_runner_lc_lm_ld_x86... vars must be defined on at least repo level if not defined on org level
+  # the sh_runner_gh_ubuntu_latest var shall be defined on org level ideally
   runner_label: |-
-      # the sh_runner_lc_lm_ld_x86... vars must be defined on at least repo level if not defined on org level
-      # the sh_runner_gh_ubuntu_latest var shall be defined on org level ideally
       ${{ case(
         inputs.custom_runner != '', inputs.custom_runner,
         vars.sh_runner_lc_lm_ld_x86 != '', vars.runner_label_lc_lm_ld_x86,
