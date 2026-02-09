@@ -1,0 +1,21 @@
+name: Runner Selection Test
+on:
+  workflow_dispatch:
+    inputs:
+      runner_label:
+        required: true
+        type: string
+        default: "ubuntu-latest"
+  workflow_call:
+    inputs:
+      runner_label:
+        required: true
+        type: string
+        default: "ubuntu-latest"
+jobs:
+  common:
+    name: Common
+    runs-on: ${{ inputs.runner_label }}
+    steps:
+      - run: |
+          echo "Hello World on runner: ${{ inputs.runner_label }}"
