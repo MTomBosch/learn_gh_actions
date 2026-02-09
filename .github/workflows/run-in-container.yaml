@@ -15,8 +15,8 @@ on:
         description: "Docker image to push to ghcr"
         required: true
         default: pytorch/pytorch:2.9.1-cuda12.8-cudnn9-runtime
-  push:
-    branches: [ main ]
+  #push:
+  #  branches: [ main ]
 env:
   IMG: ${{ inputs.docker_image }}
   IMG_PUSH: ${{ inputs.docker_image_push }}
