@@ -6,8 +6,8 @@ on:
         description: "Docker image for remote cache service container"
         required: true
         default: buchgr/bazel-remote-cache:latest
-  push:
-    branches: [ main ]
+#  push:
+#    branches: [ main ]
 env:
   IMG: ${{ inputs.docker_image || 'buchgr/bazel-remote-cache:latest' }}
   USR: ${{ github.repository_owner }}
