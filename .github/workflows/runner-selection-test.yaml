@@ -3,20 +3,23 @@ on:
   workflow_dispatch:
     inputs:
       runner_label:
-        required: true
         type: string
-        default: "ubuntu-latest"
   workflow_call:
     inputs:
       runner_label:
-        required: true
         type: string
-        default: "ubuntu-latest"
   push:
     branches: [ main ]
+env:
+  runner_label: |-
+      ${{ case(
+        inputs.runner_label != '', inputs.runner_label,
+        vars.runner_label != '', vars.runner_label,
+        'ubuntu-latest'
+      ) }}
 jobs:
-  common:
-    name: Common
+  use-input-or-var:
+    name: Use input or var as rununer
     #runs-on: ${{ inputs.runner_label }}
     runs-on: |-
       ${{ case(
@@ -26,4 +29,11 @@ jobs:
       ) }}
     steps:
       - run: |
+          env
           echo "Hello World on runner: ${{ inputs.runner_label }}"
+#  use-env:
+#    name: Use env var as rununer
+#    runs-on: ${{ env.runner_label }}
+#    steps:
+#      - run: |
+#          echo "Hello World on runner: ${{ inputs.runner_label }}"
