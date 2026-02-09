@@ -12,6 +12,8 @@ on:
         required: true
         type: string
         default: "ubuntu-latest"
+  push:
+    branches: [ main ]
 jobs:
   common:
     name: Common
