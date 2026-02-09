@@ -31,7 +31,7 @@ jobs:
         id: compute-runner-label
         run: |
           # ...
-          echo "runner_label=$runner_label" >> $GITHUB_OUTPUT
+          echo "runner_label=${{ env.runner_label }}" >> $GITHUB_OUTPUT
 
   use-label-from-prepare:
     name: Use runner label from prepare job
