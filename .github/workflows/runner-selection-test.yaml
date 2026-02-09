@@ -2,37 +2,67 @@ name: Runner Selection Test
 on:
   workflow_dispatch:
     inputs:
-      runner_label:
+      custom_runner:
         type: string
   workflow_call:
     inputs:
-      runner_label:
+      custom_runner:
         type: string
   push:
     branches: [ main ]
 env:
   runner_label: |-
+      # the sh_runner_lc_lm_ld_x86... vars must be defined on at least repo level if not defined on org level
+      # the sh_runner_gh_ubuntu_latest var shall be defined on org level ideally
       ${{ case(
-        inputs.runner_label != '', inputs.runner_label,
-        vars.runner_label != '', vars.runner_label,
+        inputs.custom_runner != '', inputs.custom_runner,
+        vars.sh_runner_lc_lm_ld_x86 != '', vars.runner_label_lc_lm_ld_x86,
+        vars.sh_runner_gh_ubuntu_latest != '', vars.sh_runner_gh_ubuntu_latest,
         'ubuntu-latest'
       ) }}
 jobs:
+  prepare:
+    name: Prepare job to compute runner label
+    outputs:
+      runner_label: ${{ steps.compute-runner-label.runner_label }}
+    runs-on: "ubuntu-slim"
+    steps:
+      - name: Compute runner label
+        id: compute-runner-label
+        run: |
+          # ...
+          echo "runner_label=$runner_label" >> $GITHUB_OUTPUT
+
+  use-label-from-prepare:
+    name: Use runner label from prepare job
+    needs: prepare
+    #runs-on: ${{ inputs.runner_label }}
+    runs-on: ${{ needs.prepare.outputs.runner_label }}
+    steps:
+      - run: |
+          env
+          echo "Hello World"
+
   use-input-or-var:
     name: Use input or var as rununer
     #runs-on: ${{ inputs.runner_label }}
     runs-on: |-
+      # the sh_runner_lc_lm_ld_x86... vars must be defined on at least repo level if not defined on org level
+      # the sh_runner_gh_ubuntu_latest var shall be defined on org level ideally
       ${{ case(
-        inputs.runner_label != '', inputs.runner_label,
-        vars.runner_label != '', vars.runner_label,
+        inputs.custom_runner != '', inputs.custom_runner,
+        vars.runner_lc_lm_ld_x86 != '', vars.runner_lc_lm_ld_x86,
+        vars.runner_gh_ubuntu_latest != '', vars.runner_gh_ubuntu_latest,
+        vars.runner_gh_ubuntu_slim != '', vars.runner_gh_ubuntu_slim,
         'ubuntu-latest'
       ) }}
     steps:
       - run: |
           env
-          echo "Hello World on runner: ${{ inputs.runner_label }}"
+          echo "Hello World "
 #  use-env:
 #    name: Use env var as rununer
+# Using an env var here is not supported !
 #    runs-on: ${{ env.runner_label }}
 #    steps:
 #      - run: |
