@@ -13,7 +13,7 @@ on:
 env:
   # If runner is given via input param then use this custom runner
   # Otherwise check if the variable that specifies the runner label is defined, if so use this variable value
-  # If nothing given use the "ubuntu-latest"
+  # If nothing given use the "ubuntu-latest" as default
   # the sh_runner_gh_ubuntu_latest var shall be defined on org level ideally
   runner_label: |-
     ${{ case(
@@ -67,5 +67,24 @@ jobs:
 # Using an env var here is not supported !
 #    runs-on: ${{ env.runner_label }}
 #    steps:
+  matrix-job-test:
+    # Matrix json object with resolved runner labels can also be generated in a prepare job
+    strategy:
+        matrix: 
+          run: 
+             - app: 'app1'
+               runner: ${{ case(
+                        inputs.custom_runner != '', inputs.custom_runner,
+                        vars.sh_runner_gh_ubuntu_latest != '', vars.sh_runner_gh_ubuntu_latest,
+                        'ubuntu-latest'
+                        )
+                      }}
+             - app: 'app2'
+               runner: ubuntu-slim
+    runs-on: ${{ matrix.run.runner }}
+    timeout-minutes: 60
+    steps:
+      - run: echo ${{ matrix.run.app }}
+
 #      - run: |
 #          echo "Hello World on runner: ${{ inputs.runner_label }}"
