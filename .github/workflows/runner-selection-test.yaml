@@ -11,15 +11,17 @@ on:
   push:
     branches: [ main ]
 env:
-  # the sh_runner_lc_lm_ld_x86... vars must be defined on at least repo level if not defined on org level
+  # If runner is given via input param then use this custom runner
+  # Otherwise check if the variable that specifies the runner label is defined, if so use this variable value
+  # If nothing given use the "ubuntu-latest"
   # the sh_runner_gh_ubuntu_latest var shall be defined on org level ideally
   runner_label: |-
-      ${{ case(
-        inputs.custom_runner != '', inputs.custom_runner,
-        vars.sh_runner_lc_lm_ld_x86 != '', vars.runner_label_lc_lm_ld_x86,
-        vars.sh_runner_gh_ubuntu_latest != '', vars.sh_runner_gh_ubuntu_latest,
-        'ubuntu-latest'
-      ) }}
+    ${{ case(
+      inputs.custom_runner != '', inputs.custom_runner,
+      vars.sh_runner_gh_ubuntu_latest != '', vars.sh_runner_gh_ubuntu_latest,
+      'ubuntu-latest'
+      )
+    }}
 jobs:
   prepare:
     name: Prepare job to compute runner label
@@ -45,16 +47,17 @@ jobs:
 
   use-input-or-var:
     name: Use input or var as rununer
-    # the sh_runner_lc_lm_ld_x86... vars must be defined on at least repo level if not defined on org level
+    # If runner is given via input param then use this custom runner
+    # Otherwise check if the variable that specifies the runner label is defined, if so use this variable value
+    # If nothing given use the "ubuntu-latest"
     # the sh_runner_gh_ubuntu_latest var shall be defined on org level ideally
     runs-on: |-
       ${{ case(
         inputs.custom_runner != '', inputs.custom_runner,
-        vars.runner_lc_lm_ld_x86 != '', vars.runner_lc_lm_ld_x86,
-        vars.runner_gh_ubuntu_latest != '', vars.runner_gh_ubuntu_latest,
-        vars.runner_gh_ubuntu_slim != '', vars.runner_gh_ubuntu_slim,
+        vars.sh_runner_gh_ubuntu_latest != '', vars.sh_runner_gh_ubuntu_latest,
         'ubuntu-latest'
-      ) }}
+        )
+      }}
     steps:
       - run: |
           env
