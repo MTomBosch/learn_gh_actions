@@ -64,17 +64,10 @@ jobs:
           echo "Hello World "
   use-json-var:
     name: Use json var
-    # If runner is given via input param then use this custom runner
-    # Otherwise check if the variable that specifies the runner label is defined, if so use this variable value
-    # If nothing given use the "ubuntu-latest"
-    # the sh_runner_gh_ubuntu_latest var shall be defined on org level ideally
-    runs-on: |-
-      ${{ case(
-        inputs.custom_runner != '', inputs.custom_runner,
-        vars.json_runner_labels != '', fromJSON(vars.json_runner_labels),
-        'ubuntu-latest'
-        )
-      }}
+    # json_runner_labels variable has following format: [ "var1", "var2", "varx" ]
+    # If variable is not given use the "ubuntu-latest"
+    # The variable shall be defined on org level ideally.
+    runs-on: ${{ vars.json_runner_labels && fromJSON(vars.json_runner_labels) || 'ubuntu-latest' }}
     steps:
       - run: |
           env
