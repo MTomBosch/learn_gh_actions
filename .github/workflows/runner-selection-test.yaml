@@ -67,7 +67,7 @@ jobs:
     # json_runner_labels variable has following format: [ "var1", "var2", "varx" ]
     # If variable is not given use the "ubuntu-latest"
     # The variable shall be defined on org level ideally.
-    runs-on: ${{ vars.json_runner_labels && fromJSON(vars.json_runner_labels) || 'ubuntu-latest' }}
+    runs-on: ${{ inputs.custom_runner || (vars.json_runner_labels && fromJSON(vars.json_runner_labels) || 'ubuntu-latest') }}
     steps:
       - run: |
           env
