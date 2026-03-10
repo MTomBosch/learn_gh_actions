@@ -18,6 +18,7 @@ env:
   runner_label: |-
     ${{ case(
       inputs.custom_runner != '', inputs.custom_runner,
+      vars.runner_labels_gh-ub_standard_x64 != '', fromJSON(vars.runner_labels_gh-ub_standard_x64),
       vars.sh_runner_gh_ubuntu_latest != '', vars.sh_runner_gh_ubuntu_latest,
       'ubuntu-latest'
       )
@@ -54,6 +55,7 @@ jobs:
     runs-on: |-
       ${{ case(
         inputs.custom_runner != '', inputs.custom_runner,
+        vars.runner_labels_gh-ub_standard_x64 != '', fromJSON(vars.runner_labels_gh-ub_standard_x64),
         vars.sh_runner_gh_ubuntu_latest != '', vars.sh_runner_gh_ubuntu_latest,
         'ubuntu-latest'
         )
