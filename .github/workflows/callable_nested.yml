@@ -1,0 +1,59 @@
+
+name: Nested callable reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        description: 'Git reference - branch, tag, or commit SHA of this file in this repository to use by the caller'
+        required: true
+        type: string
+
+env:
+  # Put the repo owner and name this file is contained in here
+  repository: mtombosch/learn_gh_actions
+
+jobs:
+  run_nested_callable_workflow_steps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Checkout callable repository 'Workaround 3 Dynamic'
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ inputs.git_ref }}
+          path: .github/.reuse_gha_assets/${{ env.repository }}/${{ inputs.git_ref }}
+
+      # Cannot use this code as the "uses" must have a static value
+      # - name: Call Reusable Action from this Repo
+      #   uses: ./.github/.reuse_gha_assets/${{ env.repository }}/${{ inputs.git_ref }}/.github/actions/callable
+      - name: Call Reusable Action from this Repo 'Workaround 4'
+        uses: jenseng/dynamic-uses@v1.1.1
+        with:
+          uses: mtombosch/learn_gh_actions/.github/actions/callable@${{ inputs.git_ref }}
+          with: |
+            git_ref: ${{ inputs.git_ref }}
+
+      - name: Call script from the workflow repository
+        shell: bash
+        run: |
+          echo "::group::  Call script from the workflow repository"
+
+          # Call the script using relative path
+          chmod +x ./.github/.reuse_gha_assets/${{ env.repository }}/${{ inputs.git_ref }}/.github/scripts/script.sh
+          ./.github/.reuse_gha_assets/${{ env.repository }}/${{ inputs.git_ref }}/.github/scripts/script.sh
+
+          echo "::endgroup::"
+
+      - name: Checkout callable repository 'Workaround 3 Static'
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.repository }}
+          ref: ${{ inputs.git_ref }}
+          path: .github/.reuse_gha_assets/${{ env.repository }}
+
+      - name: Call Reusable Action from this Repo 'Workaround 3 Static'
+        uses: ./.github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/actions/callable_wa3static

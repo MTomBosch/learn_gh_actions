@@ -1,0 +1,68 @@
+# =========================================================================================================================
+# Example of a workflow that reuses workflows, actions and scripts from a central repository. The recommended mechanism
+# how the central repository is used is visible in below example code. Following rules apply for "reusing central GHA assets from a central repository":
+#
+# - The central repository must be checked out into the workspace of the calling workflow job in case any of the central actions or scripts need to be called.
+# - The central repository must be checked out into a predefined folder in the workspace of the calling workflow job. The path of this folder must be
+#   .github/.reuse_gha_assets/<central GHA assets repo_owner>/<central GHA assets repo_name>.
+# - Reusable workflows that need to run any of the central actions or scripts must have an input parameter called "git_ref" so that they can do a checkout of
+#   the central GHA assets repository in the proper version.
+# - When changing the reference of the central GHA assets repository search and replace the old reference in all "uses" statements and search for parameters
+#   called "git_ref" in the whole repository and change the value to the new reference.
+# - The checkout of the central GHA assets repo is never done by actions or scripts. If at all it is done by workflows. Actions and scripts must assume that the
+#   central repository is already checked out by the calling workflow and available in the predefined folder in the workspace.
+#
+name: Caller example implementation
+
+on:
+  push:
+  workflow_dispatch:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  # This workflow uses central actions or scripts so the there is a need for the git_ref input.
+  call-central-workflow-using-central-actions-scripts:
+    uses: mtombosch/learn_gh_actions/.github/workflows/callable.yml@tml2si
+    with:
+      # Must use same ref like in the above uses call. Otherwise the actions/scripts called within the reusable workflow will not match the version of the
+      # reusable workflow and might not work.
+      git_ref: "tml2si"
+
+
+  # This workflow uses no central actions or scripts so the there is no need for the git_ref input.
+  call-central-workflow-not-using-central-actions-scripts:
+    uses: mtombosch/learn_gh_actions/.github/workflows/callable_no_centraL_actions_scripts.yml@tml2si
+
+  call-central-action-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v6
+
+      # Checkout the repository with the central actions and scripts
+      # ATTENTION: Make sure the ref in the checkout below is the same as the ref used in the "uses" of "call-central-workflow" job above and the ref
+      - name: Checkout central GHA assets repository
+        uses: actions/checkout@v6
+        with:
+          repository: mtombosch/learn_gh_actions
+          ref: tml2si
+          path: .github/.reuse_gha_assets/mtombosch/learn_gh_actions
+
+      - name: Call script
+        shell: bash
+        run: |
+          echo "::group::  Call script"
+
+          chmod +x ./.github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/scripts/script.sh
+          ./.github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/scripts/script.sh
+
+          echo "::endgroup::"
+
+      - name: Call central composite action via local predefined path
+        uses: ./.github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/actions/callable_wa3static
+

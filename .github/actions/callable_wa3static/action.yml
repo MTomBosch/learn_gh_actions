@@ -1,0 +1,52 @@
+name: Callable Action Workaround 3 static
+description: A reusable action that can be called from other workflows.
+
+
+# ==========================================================================
+# ATTENTION !!!!!!
+#
+# Before calling this action make sure the repository where this action is located is checked out into a folder
+# with the path .github/.reuse_gha_assets/mtombosch/learn_gh_actions in the workspace of the calling workflow.
+#
+# ==========================================================================
+
+runs:
+  using: "composite"
+  steps:
+    - name: Print callable action context
+      shell: bash
+      env:
+        GH_ACTION_REPO: ${{ github.action_repository }}
+        GH_ACTION_REF: ${{ github.action_ref }}
+      run: |
+        echo "::group::  Print callable action context"
+
+        echo "This is a callable action that calls a script and another nested action from the same repo!"
+
+        echo "github.action: ${{ github.action }}"
+        echo "github.action_path: ${{ github.action_path }}"
+        echo "github.action_ref: ${{ github.action_ref }}"
+        echo "github.action_repository: ${{ github.action_repository }}"
+        echo "github.workflow_ref: ${{ github.workflow_ref }}"
+        echo "github.workflow_sha: ${{ github.workflow_sha }}"
+        echo "github.workflow: ${{ github.workflow }}"
+
+        echo "GH_ACTION_REPO: $GH_ACTION_REPO"
+        echo "GH_ACTION_REF: $GH_ACTION_REF"
+
+        echo "::endgroup::"
+
+    - name: Call script from actions repository
+      shell: bash
+      run: |
+        echo "::group::  Call script from actions repository"
+
+        # Go to predefined folder within workspace where the repository of this action is being checked out by the calling workflow
+        cd .github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/scripts
+        chmod +x script.sh
+        ./script.sh
+
+        echo "::endgroup::"
+
+    - name: Call nested action
+      uses: ./.github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/actions/callable_nested

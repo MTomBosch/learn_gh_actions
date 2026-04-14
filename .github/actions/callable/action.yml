@@ -1,0 +1,116 @@
+name: Callable Action
+description: A reusable action that can be called from other workflows.
+
+inputs:
+  git_ref:
+    # Required only for 'Workaround 4'
+    description: 'Git reference - branch, tag, or commit SHA of this file in this repository to use by the caller'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Print callable action context
+      shell: bash
+      env:
+        GH_ACTION_REPO: ${{ github.action_repository }}
+        GH_ACTION_REF: ${{ github.action_ref }}
+      run: |
+        echo "::group::  Print callable action context"
+
+        echo "This is a callable action that calls a script and another nested action from the same repo!"
+
+        echo "github.action: ${{ github.action }}"
+        echo "github.action_path: ${{ github.action_path }}"
+        echo "github.action_ref: ${{ github.action_ref }}"
+        echo "github.action_repository: ${{ github.action_repository }}"
+        echo "github.workflow_ref: ${{ github.workflow_ref }}"
+        echo "github.workflow_sha: ${{ github.workflow_sha }}"
+        echo "github.workflow: ${{ github.workflow }}"
+        echo "inputs.git_ref: ${{ inputs.git_ref }}"
+
+        echo "GH_ACTION_REPO: $GH_ACTION_REPO"
+        echo "GH_ACTION_REF: $GH_ACTION_REF"
+
+        echo "::endgroup::"
+
+    - name: Call script from actions repository
+      shell: bash
+      run: |
+        echo "::group::  Call script from actions repository"
+
+        echo "github.action_path: ${{ github.action_path }}"
+        # action_path points to the folder where the action.yml is located. Typically some path with ..../.github/actions/<action name>
+        cd ${{ github.action_path }}
+        # Go to root of the actions repository
+        cd ../../..
+
+        # Go into the script folder
+        cd .github/scripts
+        chmod +x script.sh
+        ./script.sh
+
+        echo "::endgroup::"
+
+      # Next call does not work since the "uses" must be a static string
+      # - name: Call remote action
+      #   uses: mtombosch/learn_gh_actions/.github/actions/callable_nested@${{ inputs.git_ref }}
+
+    - name: Call nested action 'Workaround 4'
+      uses: jenseng/dynamic-uses@v1.1.1
+      with:
+        uses: mtombosch/learn_gh_actions/.github/actions/callable_nested@${{ inputs.git_ref }}
+
+    - name: Symlink current actions repo 'Workaround 2'
+      shell: bash
+      run: |
+        echo "::group::  Symlink current actions repo 'Workaround 2'"
+
+        set +e
+
+        # Workaround 2 description:
+        # 1. Get the path of the currently used action using github.action_path.
+        # 2. Create a symlink to the root of the actions repository in a predefined folder within the $HOME/work/_actions folder.
+        # 3. This will allow us to reference any action within the repository in a static way in the "uses" statement of the next step to call the action.
+
+        # Original solution found here: https://github.com/orgs/community/discussions/41927
+
+        echo "github.action_path: ${{ github.action_path }}"
+        # action_path points to the folder where the action.yml is located. Typically some path with ..../.github/actions/<action name>
+        cd ${{ github.action_path }}
+        # Go to root of the actions repository
+        cd ../../..
+        ACTIONS_REPO_ROOT=$(pwd)
+        echo "Actions repository root: $ACTIONS_REPO_ROOT"
+
+        # Use name of this action in the predefined folder within the _actions to avoid clashes with other actions that might be symlinking the same repository
+        # in the same job.
+        echo "Symlink $(pwd) to ${HOME}/work/_callable_action_repo_symlink"
+        # Delete the symlink if it already exists to avoid conflicts with previous runs of the same action in the same job.
+        rm -f ${HOME}/work/_actions/_callable_action_repo_symlink
+        ln -s $ACTIONS_REPO_ROOT ${HOME}/work/_actions/_callable_action_repo_symlink
+
+        ## Cannot use random folder name as the below "uses" statement needs to reference a static path. If we use a random folder name, we won't be able to
+        #    reference it in the "uses" statement of the next step to call the nested action.
+        # # Create random folder name to symlink the action repository to avoid conflicts with other jobs that might be running in parallel and symlinking the same action repository
+        # SYMLINK_FOLDER_NAME="current_action_repo_$(cat /proc/sys/kernel/random/uuid | sed 's/[-]//g' | head -c 10; echo;)"
+        # # Symlink the action repository to a unique folder name within the _actions folder
+        # echo "Symlink $(pwd) to ${HOME}/work/_actions/$SYMLINK_FOLDER_NAME"
+        # ln -s $ACTIONS_REPO_ROOT ${HOME}/work/_actions/$SYMLINK_FOLDER_NAME
+        # But maybe this could be used https://github.com/marketplace/actions/dynamic-uses to dynamically call the nested action without needing a static path? This would be a better solution as it would allow multiple jobs to symlink the same repository without conflicts.
+
+        echo "::endgroup::"
+
+    - name: Call nested action 'Workaround 2'
+      uses: ./../../_actions/_callable_action_repo_symlink/.github/actions/callable_nested
+
+    - name: Unlink the action repository 'Workaround 2'
+      if: ${{ always() }}
+      continue-on-error: true
+      shell: bash
+      run: |
+        echo "::group::  Unlink the action repository 'Workaround 2'"
+
+        rm -f ${HOME}/work/_actions/_callable_action_repo_symlink
+
+        echo "::endgroup::"

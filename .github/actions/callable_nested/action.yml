@@ -1,0 +1,28 @@
+name: Callable Action Nested
+description: A reusable action that can be called from other actions in the same repo
+
+runs:
+  using: "composite"
+  steps:
+    - name: Print nested callable action context
+      shell: bash
+      env:
+        GH_ACTION_REPO: ${{ github.action_repository }}
+        GH_ACTION_REF: ${{ github.action_ref }}
+      run: |
+        echo "::group::  Print nested callable action context"
+
+        echo "This is a nested callable action"
+
+        echo "github.action: ${{ github.action }}"
+        echo "github.action_path: ${{ github.action_path }}"
+        echo "github.action_ref: ${{ github.action_ref }}"
+        echo "github.action_repository: ${{ github.action_repository }}"
+        echo "github.workflow_ref: ${{ github.workflow_ref }}"
+        echo "github.workflow_sha: ${{ github.workflow_sha }}"
+        echo "github.workflow: ${{ github.workflow }}"
+
+        echo "GH_ACTION_REPO: $GH_ACTION_REPO"
+        echo "GH_ACTION_REF: $GH_ACTION_REF"
+
+        echo "::endgroup::"

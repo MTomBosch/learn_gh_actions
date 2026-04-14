@@ -1,0 +1,21 @@
+
+name: Callable independent reusable workflow
+
+on:
+  workflow_call:
+
+jobs:
+  run_callable_workflow_steps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run some bash code
+        shell: bash
+        run: |
+          echo "::group::  Run some bash code"
+
+          echo "This is some bash code running in the callable workflow"
+
+          echo "::endgroup::"

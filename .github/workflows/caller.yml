@@ -1,0 +1,99 @@
+name: Test Caller uses remote actions and workflows
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      central_gha_assets_repo:
+        description: 'Repository owner/name for same org (e.g., mtombosch/learn_gh_actions)'
+        required: true
+        default: 'mtombosch/learn_gh_actions'
+        type: string
+      central_gha_assets_repo_ref:
+        description: 'Git reference for same org (branch, tag, or commit)'
+        required: true
+        default: 'tml2si'
+        type: string
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CENTRAL_GHA_ASSETS_REPO: ${{ inputs.central_gha_assets_repo || 'mtombosch/learn_gh_actions' }}
+  CENTRAL_GHA_ASSETS_REPO_REF: ${{ inputs.central_gha_assets_repo_ref || 'tml2si' }}
+
+jobs:
+
+  call-remote-action-same-org:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v6
+
+      - name: Check if repository already checked out 'Workaround 3 Dynamic'
+        id: repo-check
+        shell: bash
+        run: |
+          echo "::group::  Check if repository already checked out 'Workaround 3 Dynamic'"
+
+          repo_path=".github/.reuse_gha_assets/${{ env.CENTRAL_GHA_ASSETS_REPO }}/${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}"
+          if [ -d "$repo_path" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "::endgroup::"
+
+      - name: Checkout callable repository 'Workaround 3 Dynamic'
+        if: steps.repo-check.outputs.exists == 'false'
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.CENTRAL_GHA_ASSETS_REPO }}
+          ref: ${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}
+          path: .github/.reuse_gha_assets/${{ env.CENTRAL_GHA_ASSETS_REPO }}/${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}
+
+      # Next call does not work since the "uses" must be a static string
+      # - name: Call remote action using relative path
+      #   uses: ./.github/.reuse_gha_assets/${{ inputs.central_gha_assets_repo }}/${{ inputs.central_gha_assets_repo_ref }}/.github/actions/callable
+
+      # This also does not work since the dynamic-uses action does not support local/relative paths of the action to call
+      # - name: Call remote action using dynamic path 'Workaround 4'
+      #   uses: jenseng/dynamic-uses@v1.1.1
+      #   with:
+      #     uses: ./.github/.reuse_gha_assets/${{ env.CENTRAL_GHA_ASSETS_REPO }}/${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}/.github/actions/callable
+      #     with: |
+      #       git_ref: ${{ inputs.git_ref }}
+
+      - name: Call script 'Workaround 3 Dynamic'
+        shell: bash
+        run: |
+          echo "::group::  Call script 'Workaround 3 Dynamic'"
+
+          chmod +x ./.github/.reuse_gha_assets/${{ env.CENTRAL_GHA_ASSETS_REPO }}/${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}/.github/scripts/script.sh
+          ./.github/.reuse_gha_assets/${{ env.CENTRAL_GHA_ASSETS_REPO }}/${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}/.github/scripts/script.sh
+
+          echo "::endgroup::"
+
+      - name: Call remote action via remote path 'Workaround 4'
+        uses: jenseng/dynamic-uses@v1.1.1
+        with:
+          uses: ${{ env.CENTRAL_GHA_ASSETS_REPO }}/.github/actions/callable@${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}
+          with: |
+            git_ref: ${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}
+
+      - name: Call remote action via local path 'Workaround 4'
+        uses: jenseng/dynamic-uses@v1.1.1
+        with:
+          uses: ./.github/.reuse_gha_assets/${{ env.CENTRAL_GHA_ASSETS_REPO }}/${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}/.github/actions/callable
+          with: |
+            git_ref: ${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}
+
+  call-remote-workflow-same-org:
+    uses: mtombosch/learn_gh_actions/.github/workflows/callable.yml@tml2si
+    with:
+      # Must use same ref like in the above uses call
+      git_ref: "tml2si"
+
