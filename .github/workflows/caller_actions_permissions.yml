@@ -12,11 +12,11 @@ concurrency:
 permissions: write-all
 
 jobs:
-  # call-other-org-workflow:
-  #   # workflow will fail but it only needs to start up for this text
-  #   uses: eclipse-score/cicd-workflows/.github/workflows/docs.yml@main
+  call-other-org-workflow:
+    # workflow will fail but it only needs to start up for this text
+    uses: eclipse-score/cicd-workflows/.github/workflows/docs.yml@main
 
- 
+
 
 
   # # This workflow uses central actions or scripts so the there is a need for the git_ref input.
