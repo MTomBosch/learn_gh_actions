@@ -1,0 +1,63 @@
+name: Test Actions Permissions Settings
+
+on:
+  push:
+  workflow_dispatch:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  call-other-org-workflow:
+    # workflow will fail but it only needs to start up for this text
+    uses: eclipse-score/cicd-workflows/.github/workflows/docs.yml@main
+
+
+
+
+
+
+  # This workflow uses central actions or scripts so the there is a need for the git_ref input.
+  call-central-workflow-using-central-actions-scripts:
+    uses: mtombosch/learn_gh_actions/.github/workflows/callable.yml@test_actions_permissions
+    with:
+      # Must use same ref like in the above uses call. Otherwise the actions/scripts called within the reusable workflow will not match the version of the
+      # reusable workflow and might not work.
+      git_ref: "test_actions_permissions"
+
+
+  # This workflow uses no central actions or scripts so the there is no need for the git_ref input.
+  call-central-workflow-not-using-central-actions-scripts:
+    uses: mtombosch/learn_gh_actions/.github/workflows/callable_no_centraL_actions_scripts.yml@test_actions_permissions
+
+  call-central-action-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v6
+
+      # Checkout the repository with the central actions and scripts
+      # ATTENTION: Make sure the ref in the checkout below is the same as the ref used in the "uses" of "call-central-workflow" job above and the ref
+      - name: Checkout central GHA assets repository
+        uses: actions/checkout@v6
+        with:
+          repository: mtombosch/learn_gh_actions
+          ref: test_actions_permissions
+          path: .github/.reuse_gha_assets/mtombosch/learn_gh_actions
+
+      - name: Call script
+        shell: bash
+        run: |
+          echo "::group::  Call script"
+
+          chmod +x ./.github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/scripts/script.sh
+          ./.github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/scripts/script.sh
+
+          echo "::endgroup::"
+
+      - name: Call central composite action via local predefined path
+        uses: ./.github/.reuse_gha_assets/mtombosch/learn_gh_actions/.github/actions/callable_wa3static
+
