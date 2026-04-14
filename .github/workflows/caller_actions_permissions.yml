@@ -19,6 +19,7 @@ jobs:
 
 
 
+
   # This workflow uses central actions or scripts so the there is a need for the git_ref input.
   call-central-workflow-using-central-actions-scripts:
     uses: mtombosch/learn_gh_actions/.github/workflows/callable.yml@test_actions_permissions
