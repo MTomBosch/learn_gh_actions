@@ -27,16 +27,16 @@ jobs:
 
   # This workflow uses central actions or scripts so the there is a need for the git_ref input.
   call-central-workflow-using-central-actions-scripts:
-    uses: mtombosch/learn_gh_actions/.github/workflows/callable.yml@tml2si
+    uses: mtombosch/learn_gh_actions/.github/workflows/callable.yml@test_actions_permissions
     with:
       # Must use same ref like in the above uses call. Otherwise the actions/scripts called within the reusable workflow will not match the version of the
       # reusable workflow and might not work.
-      git_ref: "tml2si"
+      git_ref: "test_actions_permissions"
 
 
   # This workflow uses no central actions or scripts so the there is no need for the git_ref input.
   call-central-workflow-not-using-central-actions-scripts:
-    uses: mtombosch/learn_gh_actions/.github/workflows/callable_no_centraL_actions_scripts.yml@tml2si
+    uses: mtombosch/learn_gh_actions/.github/workflows/callable_no_centraL_actions_scripts.yml@test_actions_permissions
 
   call-central-action-script:
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: mtombosch/learn_gh_actions
-          ref: tml2si
+          ref: test_actions_permissions
           path: .github/.reuse_gha_assets/mtombosch/learn_gh_actions
 
       - name: Call script

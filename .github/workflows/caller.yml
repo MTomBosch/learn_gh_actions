@@ -12,7 +12,7 @@ on:
       central_gha_assets_repo_ref:
         description: 'Git reference for same org (branch, tag, or commit)'
         required: true
-        default: 'tml2si'
+        default: 'test_actions_permissions'
         type: string
   pull_request:
 
@@ -22,7 +22,7 @@ concurrency:
 
 env:
   CENTRAL_GHA_ASSETS_REPO: ${{ inputs.central_gha_assets_repo || 'mtombosch/learn_gh_actions' }}
-  CENTRAL_GHA_ASSETS_REPO_REF: ${{ inputs.central_gha_assets_repo_ref || 'tml2si' }}
+  CENTRAL_GHA_ASSETS_REPO_REF: ${{ inputs.central_gha_assets_repo_ref || 'test_actions_permissions' }}
 
 jobs:
 
@@ -92,8 +92,8 @@ jobs:
             git_ref: ${{ env.CENTRAL_GHA_ASSETS_REPO_REF }}
 
   call-remote-workflow-same-org:
-    uses: mtombosch/learn_gh_actions/.github/workflows/callable.yml@tml2si
+    uses: mtombosch/learn_gh_actions/.github/workflows/callable.yml@test_actions_permissions
     with:
       # Must use same ref like in the above uses call
-      git_ref: "tml2si"
+      git_ref: "test_actions_permissions"
 
